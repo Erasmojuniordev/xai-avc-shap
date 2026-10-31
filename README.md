@@ -48,6 +48,16 @@ python -m http.server 8765 --bind 127.0.0.1
 
 Abra `http://127.0.0.1:8765/site/index.html` no navegador. A página mostra um retrato estático da execução registrada; se o modelo ou a amostra mudarem, atualize seus números e figuras. O código de modelagem está em `stroke_xai.py`; as métricas e a importância SHAP exportadas estão em `results/`. A interpretação detalhada está em [DISCUSSAO_CLINICA.md](DISCUSSAO_CLINICA.md).
 
+## Experimento secundário: ordem do SMOTENC e da validação cruzada
+
+Execute na raiz do projeto:
+
+```powershell
+.\.venv\Scripts\python.exe experiments\compare_cv_protocols.py
+```
+
+O script usa o mesmo CSV adulto, RF de 200 árvores e dez dobras estratificadas com semente fixa. Compara SMOTENC **dentro** de cada dobra de treino com uma avaliação exploratória em que toda a coorte é balanceada **antes** de criar as dobras, à semelhança da ordem sugerida pelo artigo. O segundo protocolo inclui exemplos sintéticos na validação e pode ter vazamento; não substitui o teste real da análise principal. Os resultados por dobra, médias, desvios e matrizes de confusão ficam em [`results/comparacao_cv.json`](results/comparacao_cv.json). A leitura está em [DISCUSSAO_CLINICA.md](DISCUSSAO_CLINICA.md).
+
 ## Limite da comparação
 
 O artigo informa 3.254 participantes adultos, mas o CSV incluído contém 4.194 registros com idade acima de 18 anos. A auditoria também encontra `N/A` em `bmi`. O teste preserva a prevalência original. Nesta execução, a AUC-ROC foi 0,755 e o recall da classe positiva foi 0,184; os resultados são inferiores aos publicados sob outro protocolo. As probabilidades do RF treinado com SMOTENC não foram calibradas e não são estimativas clínicas individuais de risco futuro.

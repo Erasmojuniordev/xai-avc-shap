@@ -16,6 +16,19 @@ O filtro `age > 18` produziu 4.194 registros, dos quais 247 têm `stroke=1`. O s
 
 Matriz de confusão: 724 verdadeiros negativos, 66 falsos positivos, 40 falsos negativos e 9 verdadeiros positivos. A acurácia, isoladamente, esconderia os 40 positivos não identificados. A Tabela 2 de [Dritsas e Trigka (2022)](https://doi.org/10.3390/s22134670) apresenta RF com precisão, recall e F-measure médios de 0,966, AUC de 0,986 e acurácia de 0,97, em WEKA e validação cruzada sobre o conjunto balanceado. Não são resultados diretamente comparáveis: a coorte publicada tem 3.254 pessoas, não 4.194, e o protocolo publicado sugere SMOTE antes da validação cruzada. Isso **pode** inflar as métricas por vazamento entre dobras, mas o artigo não fornece código para demonstrar cada passo. O RF de scikit-learn também não é uma cópia paramétrica comprovada do RF de WEKA.
 
+### Experimento secundário: efeito do protocolo de avaliação
+
+Para investigar a divergência, `experiments/compare_cv_protocols.py` executou duas validações cruzadas estratificadas de dez dobras sobre os **mesmos 4.194 adultos**, com RF de 200 árvores e `random_state=42`. Em cada protocolo, a tabela traz a média das métricas por dobra, sempre com `stroke=1` como classe positiva:
+
+| Protocolo | Registros avaliados | Acurácia | Precisão | Recall | F1 | AUC-ROC |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| SMOTENC somente nos nove décimos de treino de cada dobra | 4.194 reais | 0,878 | 0,130 | 0,182 | 0,151 | 0,738 |
+| SMOTENC na coorte inteira antes das dobras | 7.894, incluindo 3.700 sintéticos | 0,932 | 0,917 | 0,951 | 0,933 | 0,981 |
+
+No protocolo seguro, a soma das matrizes de confusão é TN=3.638, FP=309, FN=202, TP=45. Isso equivale a identificar apenas 45 dos 247 casos reais de AVC. É coerente com o teste separado principal: acurácia de 0,874 e recall de 0,184. Já no protocolo pré-balanceado, cada dobra valida uma mistura artificial com 50% de positivos e há risco de exemplos sintéticos aparentados a registros de treino nas dobras de validação. Sua matriz somada (TN=3.606, FP=341, FN=195, TP=3.752) conta positivos sintéticos junto dos reais; portanto, **não mede a detecção de 3.752 AVCs reais**.
+
+A AUC de 0,981 no segundo protocolo se aproxima da AUC de 0,986 publicada, enquanto a acurácia de 0,932 continua abaixo de 0,97. Isso demonstra que **a escolha do protocolo altera muito o resultado neste CSV**, mas não prova que ela explique toda a diferença em relação ao artigo: a coorte publicada não é recuperável do CSV fornecido, a imputação foi necessária aqui e o RF de WEKA pode diferir. A comparação também muda simultaneamente a composição da validação (real para mista) e o risco de vazamento; não isola numericamente esses dois efeitos. O resultado de referência para desempenho em pessoas reais permanece o teste principal de 839 pessoas. As métricas por dobra e desvios estão em `results/comparacao_cv.json`.
+
 ## SHAP global
 
 O `TreeExplainer` explicou 200 pessoas reais do teste, amostradas com `random_state=42`. A classe `stroke=1` foi selecionada explicitamente da saída `(200, 22, 2)` do SHAP 0.54.1. A soma das contribuições e do valor-base coincidiu com `predict_proba` até erro numérico. A importância abaixo soma os SHAP das categorias de uma variável **em cada pessoa** e depois calcula a média do valor absoluto:
