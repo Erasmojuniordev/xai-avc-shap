@@ -2,6 +2,14 @@
 
 **Execução:** Python 3.14.2, `random_state=42`, CSV incluído no repositório (SHA-256 `644d473b05d2797006bd94865e4f8bb057f0c721617911613c82c8fc707420`). Os números abaixo vêm de `notebooks/02_modelo_e_shap.ipynb`, `results/metrics.json` e `results/importancia_shap.csv`. São resultados de um experimento acadêmico, não de validação clínica.
 
+## Procedência e escopo das conclusões
+
+[Gibson et al. (2026), *BMC Medicine*](https://doi.org/10.1186/s12916-026-04981-y) investigaram especificamente o dataset Kaggle de AVC com 5.110 linhas usado aqui. Encontraram ausência de informação verificável sobre onde, quando, por quem e como os dados foram coletados (0 de 9 itens de procedência TRIPOD+AI atendidos), além de padrões anômalos de identificador, glicose e idade. Os autores afirmam que a autenticidade não pôde ser verificada; **não demonstraram que todos os registros são sintéticos ou fabricados**. O responsável pela publicação no Kaggle o apresenta para fins educacionais, segundo a análise deles.
+
+Isso altera a interpretação do projeto: o pipeline pode ser reproduzível e o SHAP pode explicar corretamente as previsões computadas **neste CSV**, mas nenhuma dessas verificações demonstra que as relações aprendidas representem pacientes reais. O confronto com fatores de risco conhecidos é uma checagem de plausibilidade, não validação clínica. O trabalho deve ser apresentado como estudo didático de reprodução, explicabilidade e limites de dados/método, sem recomendação de uso para cuidado de pacientes.
+
+Uma fonte alternativa com procedência documentada é o [NHANES 2017–2018 do CDC](https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/default.aspx?BeginYear=2017), cuja variável [MCQ160f](https://wwwn.cdc.gov/nchs/nhanes/search/variablelist.aspx?Cycle=2017-2018) registra se a pessoa relata já ter recebido diagnóstico de AVC. Migrar para ele exigiria redesenhar variáveis, pré-processamento e avaliação: seria **um novo experimento**, sem comparação numérica direta com Dritsas e Trigka. O desfecho também é retrospectivo e autorreferido, não risco prospectivo de AVC.
+
 ## Baseline e comparabilidade
 
 O filtro `age > 18` produziu 4.194 registros, dos quais 247 têm `stroke=1`. O split estratificado separou 3.355 registros para treino (198 positivos) e 839 para teste (49 positivos). A mediana de `bmi`, a codificação e o SMOTENC foram ajustados somente no treino. O teste não foi reamostrado.

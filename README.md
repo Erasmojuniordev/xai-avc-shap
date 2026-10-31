@@ -4,6 +4,8 @@ Extensão do estudo de Dritsas e Trigka (2022), *Stroke Risk Prediction with Mac
 
 Repositório privado: [Erasmojuniordev/xai-avc-shap](https://github.com/Erasmojuniordev/xai-avc-shap).
 
+**Procedência dos dados:** [Gibson et al. (2026)](https://doi.org/10.1186/s12916-026-04981-y) analisaram este dataset do Kaggle e encontraram ausência de documentação sobre sua coleta e padrões anômalos. A autenticidade dos registros não foi verificada; o estudo não demonstra que todos sejam fabricados. Assim, os resultados deste repositório são uma demonstração didática de modelagem e SHAP **neste arquivo**, não evidência de risco clínico ou de utilidade em pacientes. Ver [limites de procedência](DISCUSSAO_CLINICA.md#procedência-e-escopo-das-conclusões).
+
 ## Estado
 
 - Etapa 1 concluída: ambiente e auditoria reproduzível da base.

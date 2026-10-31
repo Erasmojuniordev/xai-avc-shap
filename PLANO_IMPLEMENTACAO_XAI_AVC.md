@@ -3,6 +3,8 @@
 **Estado em 30/10/2026:** baseline, SHAP, discussão clínica, revisão final e visualização local concluídos.  
 **Escopo:** um Random Forest em Python/scikit-learn, avaliado em dados de teste não balanceados e explicado com `shap.TreeExplainer`.
 
+**Ressalva posterior sobre os dados:** [Gibson et al. (2026)](https://doi.org/10.1186/s12916-026-04981-y) identificaram falta de procedência verificável e anomalias neste dataset. O projeto concluído permanece um exercício didático sobre o arquivo fornecido; resultados e SHAP não constituem evidência clínica. A possibilidade de um novo experimento com dados documentados está descrita em `DISCUSSAO_CLINICA.md`, sem alterar o escopo ou os resultados existentes.
+
 ## 1. Pergunta e entregas
 
 **Pergunta:** quais variáveis mais influenciam as previsões do Random Forest para a classe `stroke=1`, no conjunto fornecido, e como essas contribuições se relacionam com fatores de risco clínicos conhecidos?
@@ -65,6 +67,7 @@ O artigo não fornece código nem configuração suficiente do Random Forest e d
 | 2026-10-30 | Complemento opcional e revisão | Criado painel estático local, apenas para leitura dos resultados; revisados links e execução. | `site/index.html`, `site/style.css`, `site/preview.png`; respostas HTTP 200, captura visual e validações dos notebooks e resultados. | Nenhuma; manter a página sincronizada se uma execução futura alterar os números. |
 | 2026-10-30 | Experimento secundário solicitado | Comparadas dez dobras com SMOTENC interno (avaliação em 4.194 registros reais) e SMOTENC antes das dobras (avaliação em 7.894 registros, parte sintéticos). Mantida a avaliação principal no teste original. | `experiments/compare_cv_protocols.py`, `results/comparacao_cv.json`; acurácia média 0,878 versus 0,932; AUC média 0,738 versus 0,981. Discussão acrescentada em `DISCUSSAO_CLINICA.md`. | O protocolo exploratório não valida desempenho clínico nem reproduz a coorte do artigo. |
 | 2026-10-30 | Auditoria dos acertos na validação mista | Separados positivos reais e sintéticos nas dobras do protocolo pré-balanceado, após verificar a ordem dos dados devolvidos pelo SMOTENC. | `results/comparacao_cv.json`: 139/247 positivos reais e 3.613/3.700 sintéticos acertados; relatório atualizado. | Os 139 acertos reais continuam sujeitos ao vazamento do protocolo. |
+| 2026-10-30 | Revisão de procedência | Incorporada a análise de Gibson et al. (2026) sobre a ausência de procedência verificável e anomalias no dataset de AVC; restringidas as conclusões ao valor didático da implementação. | `README.md`, `DISCUSSAO_CLINICA.md` e DOI 10.1186/s12916-026-04981-y. | Decidir se a entrega mantém esse estudo crítico ou inclui um novo experimento separado com dados documentados. |
 
 ## 5. Riscos e respostas planejadas
 
