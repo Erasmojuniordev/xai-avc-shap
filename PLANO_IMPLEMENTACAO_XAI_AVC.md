@@ -1,6 +1,6 @@
 # Plano e acompanhamento — explicabilidade da predição de AVC com SHAP
 
-**Estado em 30/10/2026:** etapa 1 (ambiente e auditoria) concluída; treinamento e explicações pendentes.  
+**Estado em 30/10/2026:** baseline, SHAP, discussão clínica, revisão final e visualização local concluídos.  
 **Escopo:** um Random Forest em Python/scikit-learn, avaliado em dados de teste não balanceados e explicado com `shap.TreeExplainer`.
 
 ## 1. Pergunta e entregas
@@ -15,7 +15,7 @@ Entregas previstas:
 4. Um ou dois waterfall plots de pessoas **reais do teste**, preferindo um verdadeiro positivo; se não houver, documentar o critério alternativo.
 5. Discussão clínica com fontes verificáveis, divergências e limites de interpretação. Comparação com `feature_importances_` apenas se houver tempo.
 
-Fora do escopo: stacking, SVM ou qualquer outro modelo, `KernelExplainer`, redes neurais, interface e otimização extensa de hiperparâmetros.
+Fora do escopo original: stacking, SVM ou qualquer outro modelo, `KernelExplainer`, redes neurais e otimização extensa de hiperparâmetros. A pedido posterior do usuário, foi acrescentada uma **página web estática opcional** para apresentar os resultados já calculados, sem inferência interativa.
 
 ## 2. Hierarquia das fontes e achados já conferidos
 
@@ -51,16 +51,18 @@ O artigo não fornece código nem configuração suficiente do Random Forest e d
 | --- | --- | --- | --- |
 | 0. Fontes e auditoria preliminar | **Concluída** | Ler artigo, apresentação, README auxiliar e CSV; localizar divergências de amostra e ausências. | Achados da seção 2 registrados. |
 | 1. Ambiente e auditoria reproduzível | **Concluída** | Ambiente virtual Python 3.14.2, dependências fixadas, notebook com contagens, tipos, `N/A`, categorias e coorte. | `notebooks/01_auditoria_dados.ipynb` executado integralmente; asserções e números da seção 2 conferidos. |
-| 2. Baseline RF | Pendente | Implementar split estratificado, pré-processamento, SMOTENC no treino, RF e métricas. | Teste permanece sem reamostragem; resultados e matriz de confusão são reproduzíveis. |
-| 3. SHAP global e local | Pendente | Verificar formato da classe positiva; gerar summary/beeswarm e 1–2 waterfalls. | Adição SHAP confere com probabilidade; casos pertencem ao teste; gráficos têm rótulos legíveis. |
-| 4. Validação clínica e comparação | Pendente | Relacionar os principais achados a fontes médicas, discutir divergências e comparação metodológica com o artigo. | Cada afirmação clínica tem fonte verificável; não há inferência causal ou alegação de validação clínica do modelo. |
-| 5. Revisão final | Pendente | Executar notebook limpo, revisar tabelas/gráficos, texto e arquivos entregues. | Nenhuma célula depende de execução fora de ordem; figuras e números correspondem à execução final. |
+| 2. Baseline RF | **Concluída** | Split estratificado, imputação e SMOTENC no treino, codificação, RF e métricas no teste original. | 3.355 treino / 839 teste; teste com 49 positivos; `results/metrics.json` e matriz de confusão reproduzidos. |
+| 3. SHAP global e local | **Concluída** | Classe positiva selecionada explicitamente; beeswarm, importância agregada e dois waterfalls reais. | Saída `(200, 22, 2)` tratada; aditividade validada; gráficos em `figures/` inspecionados. |
+| 4. Validação clínica e comparação | **Concluída** | Confronto com CDC e discussão das divergências com o artigo. | `DISCUSSAO_CLINICA.md` cita fontes e explicita limites de causalidade e calibração. |
+| 5. Revisão final | **Concluída** | Revisados arquivos, execução completa, figuras e apresentação local. | Notebook de modelo executado sem erros; notebooks validados; matriz de confusão conferida; figuras inspecionadas; painel e imagens responderam HTTP 200. |
 
 **Registro de andamento:** acrescentar a cada sessão uma linha no formato `AAAA-MM-DD | etapa | decisão/alteração | evidência (célula, figura ou arquivo) | pendência`. Não marcar uma etapa como concluída apenas porque o código foi escrito: exigir o critério da última coluna.
 
 | Data | Etapa | Decisão/alteração | Evidência | Pendência |
 | --- | --- | --- | --- | --- |
-| 2026-10-30 | 1 | Criado ambiente Python 3.14.2 e fixadas dependências diretas/transitivas; criada auditoria reproduzível sem filtrar `Unknown` ou `Other`. Estrutura do repositório auxiliar usada apenas como referência conceitual, sem copiar código. | `requirements.txt`, `requirements-lock.txt`, `notebooks/01_auditoria_dados.ipynb` executado (4 células de código, sem erro; SHA-256 `644d473b05d2797006bd94865e4f8bb057f0c721617911613c82c8fcfc707420`). | Etapa 2: split, pré-processamento, SMOTENC, Random Forest e avaliação. Publicação no GitHub depende de autenticação válida. |
+| 2026-10-30 | 1 | Criado ambiente Python 3.14.2 e fixadas dependências diretas/transitivas; criada auditoria reproduzível sem filtrar `Unknown` ou `Other`. Estrutura do repositório auxiliar usada apenas como referência conceitual, sem copiar código. | `requirements.txt`, `requirements-lock.txt`, `notebooks/01_auditoria_dados.ipynb` executado (4 células de código, sem erro; SHA-256 `644d473b05d2797006bd94865e4f8bb057f0c721617911613c82c8fcfc707420`). Commit `844a301` publicado no [repositório privado](https://github.com/Erasmojuniordev/xai-avc-shap). | Etapa 2: split, pré-processamento, SMOTENC, Random Forest e avaliação. |
+| 2026-10-30 | 2–4 | Reaproveitada a ideia de SMOTENC após o split do notebook auxiliar; implementação própria com split estratificado, pipeline sem vazamento, RF e SHAP. Documentadas métricas e leitura clínica. | `stroke_xai.py`, `notebooks/02_modelo_e_shap.ipynb`, `results/`, `figures/`, `DISCUSSAO_CLINICA.md`; execução integral sem erro. Commit `d093055` publicado no repositório privado. | Nenhuma para essas etapas. |
+| 2026-10-30 | Complemento opcional e revisão | Criado painel estático local, apenas para leitura dos resultados; revisados links e execução. | `site/index.html`, `site/style.css`, `site/preview.png`; respostas HTTP 200, captura visual e validações dos notebooks e resultados. | Nenhuma; manter a página sincronizada se uma execução futura alterar os números. |
 
 ## 5. Riscos e respostas planejadas
 

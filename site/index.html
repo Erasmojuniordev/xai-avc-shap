@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Painel acadêmico dos resultados do Random Forest e das explicações SHAP para AVC.">
+    <title>AVC · Random Forest + SHAP</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#inicio">AVC <span>/</span> XAI</a>
+      <nav aria-label="Navegação principal">
+        <a href="#metodo">Método</a>
+        <a href="#global">SHAP global</a>
+        <a href="#local">Casos locais</a>
+        <a href="#limites">Limites</a>
+      </nav>
+    </header>
+
+    <main id="inicio">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Projeto acadêmico · execução de 30/10/2026</p>
+          <h1>O que orienta a previsão de AVC deste modelo?</h1>
+          <p class="lead">Treinamos um Random Forest com dados clínicos e usamos SHAP para decompor suas previsões. Os resultados abaixo vêm de um teste separado antes do balanceamento.</p>
+          <a class="primary-link" href="#global">Explorar as explicações <span aria-hidden="true">↘</span></a>
+        </div>
+        <div class="hero-fact" aria-label="Resumo da base e avaliação">
+          <span class="fact-label">Coorte adulta</span>
+          <strong>4.194</strong>
+          <span>registros com idade acima de 18 anos</span>
+          <div class="fact-rule"></div>
+          <span class="fact-label">Teste original</span>
+          <strong>839 <small>pessoas</small></strong>
+          <span>49 com <code>stroke=1</code></span>
+        </div>
+      </section>
+
+      <section class="section metrics" id="metodo">
+        <div class="section-heading">
+          <p class="eyebrow">01 / Baseline</p>
+          <h2>Desempenho no teste sem reamostragem</h2>
+          <p>Precisão, recall e F1 referem-se à classe positiva. AUC-ROC usa a saída de probabilidade do modelo.</p>
+        </div>
+        <div class="metric-grid">
+          <article class="metric"><span>AUC-ROC</span><strong>0,755</strong><small>capacidade de ordenação</small></article>
+          <article class="metric"><span>Precisão</span><strong>0,120</strong><small>9 acertos em 75 alertas</small></article>
+          <article class="metric"><span>Recall</span><strong>0,184</strong><small>9 de 49 positivos encontrados</small></article>
+          <article class="metric"><span>F1</span><strong>0,145</strong><small>equilíbrio entre precisão e recall</small></article>
+        </div>
+        <p class="method-note">Divisão estratificada 80/20 → imputação de IMC no treino → SMOTENC no treino → codificação → Random Forest com 200 árvores. O artigo relatou métricas superiores, mas usou outra amostra e validação cruzada no conjunto já balanceado. <a href="../DISCUSSAO_CLINICA.md">Ver a comparação completa</a>.</p>
+      </section>
+
+      <section class="section visual-section" id="global">
+        <div class="section-heading">
+          <p class="eyebrow">02 / Explicação global</p>
+          <h2>Idade domina as contribuições</h2>
+          <p>As barras somam as categorias de cada variável por pessoa e calculam a média de |SHAP|. O beeswarm abaixo mostra a direção do efeito das entradas codificadas em 200 pessoas reais do teste.</p>
+        </div>
+        <figure class="chart-card compact-chart">
+          <img src="../figures/shap_importancia_agrupada.png" alt="Importância SHAP agregada por variável: idade é a maior, seguida de glicose média e tipo de trabalho.">
+          <figcaption>Importância para este modelo; não é força causal nem relevância clínica comprovada.</figcaption>
+        </figure>
+        <details class="expand-chart">
+          <summary>Ver direção dos efeitos no beeswarm</summary>
+          <figure class="chart-card">
+            <img src="../figures/shap_summary_stroke1.png" alt="Beeswarm SHAP da classe stroke=1 para 200 pessoas reais do teste, com valores altos em vermelho e baixos em azul.">
+            <figcaption>Valores SHAP positivos elevam a saída do RF para <code>stroke=1</code>; negativos a reduzem. As cores representam os valores dos atributos codificados.</figcaption>
+          </figure>
+        </details>
+      </section>
+
+      <section class="section local-section" id="local">
+        <div class="section-heading">
+          <p class="eyebrow">03 / Explicações locais</p>
+          <h2>Dois resultados, duas trajetórias</h2>
+          <p>Os waterfalls decompõem a saída do mesmo RF para dois registros reais do teste. O valor-base é próximo de 0,5 por causa do treino balanceado.</p>
+        </div>
+        <div class="case-grid">
+          <article class="case-card">
+            <div class="case-header"><span class="case-tag positive">Verdadeiro positivo</span><strong>0,98</strong></div>
+            <p>Registro 40899 · idade de 78 anos. O modelo previu <code>stroke=1</code> e o rótulo real é 1.</p>
+            <a href="../figures/shap_waterfall_verdadeiro_positivo.png"><img src="../figures/shap_waterfall_verdadeiro_positivo.png" alt="Waterfall SHAP do verdadeiro positivo 40899, com idade e tabagismo anterior entre as maiores contribuições positivas."></a>
+          </article>
+          <article class="case-card">
+            <div class="case-header"><span class="case-tag missed">Falso negativo</span><strong>0,03</strong></div>
+            <p>Registro 54385 · idade de 45 anos. O modelo previu <code>stroke=0</code>, mas o rótulo real é 1.</p>
+            <a href="../figures/shap_waterfall_falso_negativo.png"><img src="../figures/shap_waterfall_falso_negativo.png" alt="Waterfall SHAP do falso negativo 54385, com idade e glicose reduzindo a saída do modelo para stroke=1."></a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section limits" id="limites">
+        <div>
+          <p class="eyebrow">04 / Interpretação responsável</p>
+          <h2>O SHAP explica a previsão. Ele não valida o uso clínico.</h2>
+        </div>
+        <div class="limits-copy">
+          <p>O dataset registra AVC prévio, sem acompanhamento temporal demonstrado. As probabilidades do RF não foram calibradas para a prevalência real; <strong>0,98 não significa 98% de risco futuro</strong>.</p>
+          <p>Idade aparece em linha com fatores de risco descritos pelo <a href="https://www.cdc.gov/stroke/risk-factors/">CDC</a>. Hipertensão e doença cardíaca tiveram pouco impacto neste modelo, apesar de sua relevância clínica. Tipo de trabalho pode refletir fatores sociais e não deve ser interpretado como causa.</p>
+          <div class="resources">
+            <a href="../notebooks/02_modelo_e_shap.ipynb">Notebook executado <span aria-hidden="true">↗</span></a>
+            <a href="../DISCUSSAO_CLINICA.md">Discussão e fontes <span aria-hidden="true">↗</span></a>
+            <a href="../PLANO_IMPLEMENTACAO_XAI_AVC.md">Plano e andamento <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>AVC / XAI · estudo acadêmico</span>
+      <span>Dados e resultados reproduzíveis no repositório privado</span>
+    </footer>
+  </body>
+</html>
