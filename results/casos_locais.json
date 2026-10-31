@@ -1,0 +1,16 @@
+[
+  {
+    "tipo": "verdadeiro_positivo",
+    "id": 40899,
+    "real": 1,
+    "previsto": 1,
+    "probabilidade_stroke_1": 0.98
+  },
+  {
+    "tipo": "falso_negativo",
+    "id": 54385,
+    "real": 1,
+    "previsto": 0,
+    "probabilidade_stroke_1": 0.03
+  }
+]
