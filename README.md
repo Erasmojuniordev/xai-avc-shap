@@ -11,6 +11,7 @@ Repositório privado: [Erasmojuniordev/xai-avc-shap](https://github.com/Erasmoju
 - Etapa 1 concluída: ambiente e auditoria reproduzível da base.
 - Etapas 2–4 concluídas: baseline Random Forest, SHAP global e local, confronto com literatura clínica.
 - Painel web estático opcional em `site/`, para leitura local dos resultados.
+- [Apresentação crítica final](apresentacao/Apresentacao_Critica_AVC_SHAP.pptx) e [roteiro de fala](apresentacao/ROTEIRO_APRESENTACAO.md): 12 slides com resultados, SHAP, efeito da ordem do SMOTENC e procedência do dataset.
 - [Prévia do painel](site/preview.png).
 - O protocolo, as decisões e o acompanhamento estão em [PLANO_IMPLEMENTACAO_XAI_AVC.md](PLANO_IMPLEMENTACAO_XAI_AVC.md).
 
