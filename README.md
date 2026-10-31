@@ -56,7 +56,7 @@ Execute na raiz do projeto:
 .\.venv\Scripts\python.exe experiments\compare_cv_protocols.py
 ```
 
-O script usa o mesmo CSV adulto, RF de 200 árvores e dez dobras estratificadas com semente fixa. Compara SMOTENC **dentro** de cada dobra de treino com uma avaliação exploratória em que toda a coorte é balanceada **antes** de criar as dobras, à semelhança da ordem sugerida pelo artigo. O segundo protocolo inclui exemplos sintéticos na validação e pode ter vazamento; não substitui o teste real da análise principal. Os resultados por dobra, médias, desvios e matrizes de confusão ficam em [`results/comparacao_cv.json`](results/comparacao_cv.json). A leitura está em [DISCUSSAO_CLINICA.md](DISCUSSAO_CLINICA.md).
+O script usa o mesmo CSV adulto, RF de 200 árvores e dez dobras estratificadas com semente fixa. Compara SMOTENC **dentro** de cada dobra de treino com uma avaliação exploratória em que toda a coorte é balanceada **antes** de criar as dobras, à semelhança da ordem sugerida pelo artigo. O segundo protocolo inclui exemplos sintéticos na validação e pode ter vazamento; não substitui o teste real da análise principal. Os resultados por dobra, médias, desvios e matrizes de confusão — inclusive com positivos reais e sintéticos separados — ficam em [`results/comparacao_cv.json`](results/comparacao_cv.json). A leitura está em [DISCUSSAO_CLINICA.md](DISCUSSAO_CLINICA.md).
 
 ## Limite da comparação
 

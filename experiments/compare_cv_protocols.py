@@ -30,14 +30,16 @@ sys.path.insert(0, str(ROOT))
 from stroke_xai import RANDOM_STATE, build_pipeline, load_adults  # noqa: E402
 
 
-def score_fold(model, X_valid, y_valid, fold: int) -> dict[str, int | float]:
+def score_fold(
+    model, X_valid, y_valid, fold: int, original_mask: np.ndarray | None = None
+) -> dict[str, int | float | dict[str, int]]:
     """Registra métricas da classe 1 e contagens para auditoria das médias."""
     classes = model.classes_ if hasattr(model, "classes_") else model.named_steps["rf"].classes_
     positive_index = list(classes).index(1)
     predicted = model.predict(X_valid)
     probability = model.predict_proba(X_valid)[:, positive_index]
     tn, fp, fn, tp = confusion_matrix(y_valid, predicted, labels=[0, 1]).ravel()
-    return {
+    result = {
         "fold": fold,
         "n_validation": len(y_valid),
         "positives_validation": int(np.sum(y_valid)),
@@ -51,9 +53,23 @@ def score_fold(model, X_valid, y_valid, fold: int) -> dict[str, int | float]:
         "fn": int(fn),
         "tp": int(tp),
     }
+    if original_mask is not None:
+        # O SMOTENC conserva as linhas originais no começo da saída (checado
+        # em main); esta contagem separa AVC confirmado de positivo sintético.
+        for group, mask in (("originais", original_mask), ("sinteticos", ~original_mask)):
+            group_tn, group_fp, group_fn, group_tp = confusion_matrix(
+                np.asarray(y_valid)[mask], np.asarray(predicted)[mask], labels=[0, 1]
+            ).ravel()
+            result[group] = {
+                "tn": int(group_tn),
+                "fp": int(group_fp),
+                "fn": int(group_fn),
+                "tp": int(group_tp),
+            }
+    return result
 
 
-def run_folds(X, y, *, pipeline: bool) -> list[dict[str, int | float]]:
+def run_folds(X, y, *, pipeline: bool, original_mask: np.ndarray | None = None) -> list[dict]:
     """Usa a mesma semente e dez dobras estratificadas nos dois protocolos."""
     cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=RANDOM_STATE)
     folds = []
@@ -66,14 +82,15 @@ def run_folds(X, y, *, pipeline: bool) -> list[dict[str, int | float]]:
         y_train = y.iloc[train_idx] if pipeline else y[train_idx]
         y_valid = y.iloc[valid_idx] if pipeline else y[valid_idx]
         model.fit(X_train, y_train)
-        folds.append(score_fold(model, X_valid, y_valid, number))
+        fold_mask = original_mask[valid_idx] if original_mask is not None else None
+        folds.append(score_fold(model, X_valid, y_valid, number, fold_mask))
         print(f"{'seguro' if pipeline else 'pré-SMOTE'}: dobra {number}/10 concluída", flush=True)
     return folds
 
 
-def summarize(folds: list[dict[str, int | float]]) -> dict:
+def summarize(folds: list[dict]) -> dict:
     metrics = ("accuracy", "precision", "recall", "f1", "auc_roc")
-    return {
+    result = {
         "metricas": {
             name: {
                 "media": float(np.mean([fold[name] for fold in folds])),
@@ -86,6 +103,13 @@ def summarize(folds: list[dict[str, int | float]]) -> dict:
         },
         "dobras": folds,
     }
+    if "originais" in folds[0]:
+        for group in ("originais", "sinteticos"):
+            result[f"matriz_confusao_{group}_somada"] = {
+                name: sum(fold[group][name] for fold in folds)
+                for name in ("tn", "fp", "fn", "tp")
+            }
+    return result
 
 
 def main() -> None:
@@ -106,7 +130,11 @@ def main() -> None:
     assert len(encoded) == 2 * int((y == 0).sum())
     majority_count = int((y == 0).sum())
     assert np.bincount(balanced_y).tolist() == [majority_count, majority_count]
-    article_like = summarize(run_folds(encoded, balanced_y, pipeline=False))
+    # Confere a ordem antes de identificar quais linhas de validação são reais.
+    assert np.array_equal(np.asarray(balanced_X[: len(X)]), np.asarray(imputed))
+    assert np.array_equal(balanced_y[: len(y)], y.to_numpy())
+    original_mask = np.arange(len(balanced_y)) < len(y)
+    article_like = summarize(run_folds(encoded, balanced_y, pipeline=False, original_mask=original_mask))
 
     result = {
         "dataset_sha256": hashlib.sha256(csv_path.read_bytes()).hexdigest(),

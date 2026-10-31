@@ -221,7 +221,19 @@
         "tn": 361,
         "fp": 34,
         "fn": 21,
-        "tp": 374
+        "tp": 374,
+        "originais": {
+          "tn": 361,
+          "fp": 34,
+          "fn": 10,
+          "tp": 15
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 11,
+          "tp": 359
+        }
       },
       {
         "fold": 2,
@@ -235,7 +247,19 @@
         "tn": 355,
         "fp": 40,
         "fn": 21,
-        "tp": 374
+        "tp": 374,
+        "originais": {
+          "tn": 355,
+          "fp": 40,
+          "fn": 11,
+          "tp": 12
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 10,
+          "tp": 362
+        }
       },
       {
         "fold": 3,
@@ -249,7 +273,19 @@
         "tn": 364,
         "fp": 31,
         "fn": 17,
-        "tp": 378
+        "tp": 378,
+        "originais": {
+          "tn": 364,
+          "fp": 31,
+          "fn": 12,
+          "tp": 17
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 5,
+          "tp": 361
+        }
       },
       {
         "fold": 4,
@@ -263,7 +299,19 @@
         "tn": 359,
         "fp": 36,
         "fn": 19,
-        "tp": 376
+        "tp": 376,
+        "originais": {
+          "tn": 359,
+          "fp": 36,
+          "fn": 7,
+          "tp": 14
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 12,
+          "tp": 362
+        }
       },
       {
         "fold": 5,
@@ -277,7 +325,19 @@
         "tn": 363,
         "fp": 31,
         "fn": 18,
-        "tp": 377
+        "tp": 377,
+        "originais": {
+          "tn": 363,
+          "fp": 31,
+          "fn": 8,
+          "tp": 10
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 10,
+          "tp": 367
+        }
       },
       {
         "fold": 6,
@@ -291,7 +351,19 @@
         "tn": 346,
         "fp": 48,
         "fn": 20,
-        "tp": 375
+        "tp": 375,
+        "originais": {
+          "tn": 346,
+          "fp": 48,
+          "fn": 14,
+          "tp": 11
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 6,
+          "tp": 364
+        }
       },
       {
         "fold": 7,
@@ -305,7 +377,19 @@
         "tn": 364,
         "fp": 30,
         "fn": 18,
-        "tp": 377
+        "tp": 377,
+        "originais": {
+          "tn": 364,
+          "fp": 30,
+          "fn": 10,
+          "tp": 23
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 8,
+          "tp": 354
+        }
       },
       {
         "fold": 8,
@@ -319,7 +403,19 @@
         "tn": 362,
         "fp": 33,
         "fn": 20,
-        "tp": 374
+        "tp": 374,
+        "originais": {
+          "tn": 362,
+          "fp": 33,
+          "fn": 11,
+          "tp": 11
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 9,
+          "tp": 363
+        }
       },
       {
         "fold": 9,
@@ -333,7 +429,19 @@
         "tn": 368,
         "fp": 27,
         "fn": 17,
-        "tp": 377
+        "tp": 377,
+        "originais": {
+          "tn": 368,
+          "fp": 27,
+          "fn": 11,
+          "tp": 20
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 6,
+          "tp": 357
+        }
       },
       {
         "fold": 10,
@@ -347,9 +455,33 @@
         "tn": 364,
         "fp": 31,
         "fn": 24,
-        "tp": 370
+        "tp": 370,
+        "originais": {
+          "tn": 364,
+          "fp": 31,
+          "fn": 14,
+          "tp": 6
+        },
+        "sinteticos": {
+          "tn": 0,
+          "fp": 0,
+          "fn": 10,
+          "tp": 364
+        }
       }
-    ]
+    ],
+    "matriz_confusao_originais_somada": {
+      "tn": 3606,
+      "fp": 341,
+      "fn": 108,
+      "tp": 139
+    },
+    "matriz_confusao_sinteticos_somada": {
+      "tn": 0,
+      "fp": 0,
+      "fn": 87,
+      "tp": 3613
+    }
   },
   "aviso": "A segunda avaliação inclui registros sintéticos nas dobras de validação e permite vazamento entre exemplos aparentados; não estima desempenho clínico. A coorte, o RF e a imputação não reproduzem exatamente o artigo."
 }
