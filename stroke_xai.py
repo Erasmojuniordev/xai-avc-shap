@@ -94,11 +94,13 @@ def load_adults(csv_path: str | Path) -> tuple[pd.DataFrame, pd.Series, pd.Serie
     missing = required.difference(data.columns)
     if missing:
         raise ValueError(f"Colunas ausentes no CSV: {sorted(missing)}")
+    # Não aplicamos filtros adicionais para forçar os 3.254 casos do artigo.
     adults = data.loc[data["age"] > 18].copy()
     if adults["id"].duplicated().any():
         raise ValueError("Há IDs duplicados na coorte adulta.")
     if set(adults["stroke"].dropna().unique()) != {0, 1}:
         raise ValueError("O alvo precisa conter as classes 0 e 1.")
+    # O identificador acompanha as linhas para auditoria, mas não entra no RF.
     return adults.loc[:, FEATURES], adults["stroke"], adults["id"]
 
 
@@ -106,6 +108,7 @@ def split_adults(
     X: pd.DataFrame, y: pd.Series, ids: pd.Series
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, pd.Series, pd.Series]:
     """Separa antes de imputar ou reamostrar, preservando a prevalência no teste."""
+    # Esta divisão vem antes de qualquer etapa que aprenda com os dados.
     return train_test_split(
         X, y, ids, test_size=0.20, stratify=y, random_state=RANDOM_STATE
     )
@@ -113,6 +116,7 @@ def split_adults(
 
 def build_pipeline() -> Pipeline:
     """Mantém imputação, SMOTENC, codificação e RF dentro do treino."""
+    # Primeiro preenche ausências para que a reamostragem receba valores válidos.
     # A saída da primeira etapa é [3 numéricas, 7 categóricas]; os índices do
     # SMOTENC apontam para essa ordem, inclusive os indicadores binários.
     impute = ColumnTransformer(
@@ -138,7 +142,9 @@ def build_pipeline() -> Pipeline:
     return Pipeline(
         [
             ("impute", impute),
+            # O SMOTENC preserva categorias; SMOTE comum interpolaria códigos.
             ("smote", SMOTENC(categorical_features=categorical_idx, random_state=RANDOM_STATE)),
+            # One-hot vem depois da síntese para não tratar dummies como medidas.
             ("encode", encode),
             (
                 "rf",
@@ -151,7 +157,8 @@ def build_pipeline() -> Pipeline:
 
 
 def transform_for_rf(model: Pipeline, X: pd.DataFrame) -> pd.DataFrame:
-    """Transforma observações reais sem reamostrar nem ajustar novamente."""
+    """Transforma registros originais sem reamostrar nem ajustar novamente."""
+    # Para SHAP, reproduz exatamente as colunas vistas pelo RF sem chamar fit.
     imputed = model.named_steps["impute"].transform(X)
     encoded = model.named_steps["encode"].transform(imputed)
     names = model.named_steps["encode"].get_feature_names_out(list(FEATURES))
@@ -183,6 +190,7 @@ def evaluate(
     if 1 not in classes:
         raise ValueError("O Random Forest não contém a classe positiva 1.")
     positive_index = classes.index(1)
+    # A AUC usa a pontuação contínua da classe 1; as demais métricas usam 0/1.
     probabilities = model.predict_proba(X_test)[:, positive_index]
     predictions = model.predict(X_test)
     tn, fp, fn, tp = confusion_matrix(y_test, predictions, labels=[0, 1]).ravel()
@@ -211,6 +219,7 @@ def positive_shap_values(explainer, X_encoded: pd.DataFrame, classes: np.ndarray
     positive_index = class_labels.index(1)
     raw = explainer.shap_values(X_encoded)
     expected = np.asarray(explainer.expected_value)
+    # Versões antigas devolvem lista por classe; versões novas, um tensor 3D.
     if isinstance(raw, list):
         values = np.asarray(raw[positive_index])
     else:
@@ -224,13 +233,14 @@ def positive_shap_values(explainer, X_encoded: pd.DataFrame, classes: np.ndarray
 
 
 def grouped_shap_importance(values: np.ndarray, model: Pipeline) -> pd.Series:
-    """Soma dummies por variável em cada pessoa antes da média de |SHAP|."""
+    """Soma dummies por variável em cada registro antes da média de |SHAP|."""
     encoder = model.named_steps["encode"].named_transformers_["cat"]
     counts = [len(categories) for categories in encoder.categories_]
     if values.shape[1] != len(NUMERIC) + sum(counts):
         raise ValueError("As dimensões SHAP e OneHotEncoder não coincidem.")
     grouped = {name: values[:, i] for i, name in enumerate(NUMERIC)}
     start = len(NUMERIC)
+    # Soma primeiro as dummies de cada registro, preservando sinais opostos.
     for name, count in zip(CATEGORICAL, counts, strict=True):
         grouped[name] = values[:, start : start + count].sum(axis=1)
         start += count
