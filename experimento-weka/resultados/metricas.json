@@ -1,0 +1,5 @@
+{
+  "adultos": 4194, "positivos_originais": 247, "bmi_ausentes": 180, "balanceados": 7894, "seed": 42, "dobras": 10,
+  "mlp_smote_antes_cv": {"n": 7894, "accuracy": 0.87256144, "precision_stroke_1": 0.84575594, "recall_stroke_1": 0.91132506, "f1_stroke_1": 0.87731707, "auc_stroke_1": 0.91782132, "tn": 3291, "fp": 656, "fn": 350, "tp": 3597},
+  "mlp_sem_smote": {"n": 4194, "accuracy": 0.92727706, "precision_stroke_1": 0.14634146, "recall_stroke_1": 0.04858300, "f1_stroke_1": 0.07294833, "auc_stroke_1": 0.71243367, "tn": 3877, "fp": 70, "fn": 235, "tp": 12}
+}
