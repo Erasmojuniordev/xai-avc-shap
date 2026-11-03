@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Guia legível do notebook e dos módulos do projeto AVC XAI."><title>Código explicado · AVC / XAI</title><link rel="stylesheet" href="style.css"></head>
+<body><header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">✳</span> AVC <span class="brand-divider">/</span> XAI</a><nav aria-label="Navegação"><a href="index.html">Painel</a><a href="metodologia.html">Metodologia</a><a href="#arquivos">Arquivos originais</a></nav></header>
+<main class="docs"><div class="docs-hero"><p class="eyebrow">GUIA DO NOTEBOOK</p><h1>O que cada bloco de código faz</h1><p>O notebook principal executa uma sequência reproduzível. Aqui estão as decisões técnicas e trechos representativos; os arquivos originais continuam disponíveis no fim da página para execução e auditoria.</p></div>
+<nav class="docs-toc" aria-label="Nesta página"><a href="#auditoria">Auditoria</a><a href="#pipeline">Pipeline</a><a href="#avaliacao">Avaliação</a><a href="#explicacao">TreeExplainer</a><a href="#global">Global e local</a><a href="#arquivos">Arquivos</a></nav>
+<article class="docs-body">
+<section id="auditoria"><h2>1. Auditoria e divisão</h2><p><code>load_adults()</code> lê o CSV, filtra <code>age &gt; 18</code>, separa <code>stroke</code> como alvo e remove <code>id</code> das entradas. O primeiro notebook documenta contagens, ausências e categorias. Depois, <code>split_adults()</code> cria treino e teste estratificados, preservando aproximadamente a fração de positivos em ambos.</p><pre><code>train_test_split(X, y, ids, test_size=0.20,
+                 stratify=y, random_state=42)</code></pre><p>Esta separação vem antes da imputação e do SMOTENC para que o teste permaneça independente do ajuste do modelo.</p></section>
+<section id="pipeline"><h2>2. Imputação, SMOTENC e RF</h2><p><code>build_pipeline()</code> mantém as etapas de aprendizado dentro do treino. A mediana preenche variáveis numéricas ausentes e a categoria mais frequente preenche ausências categóricas. <code>SMOTENC</code> sintetiza exemplos positivos no treino, respeitando as categorias. <code>OneHotEncoder</code> converte as categorias para as colunas que as árvores recebem.</p><pre><code>Pipeline([
+    ("impute", ColumnTransformer(...)),
+    ("smote", SMOTENC(categorical_features=...,
+                       random_state=42)),
+    ("encode", ColumnTransformer(...)),
+    ("rf", RandomForestClassifier(
+        n_estimators=200, random_state=42, n_jobs=-1))
+])</code></pre><p><code>model.fit(X_train, y_train)</code> executa a sequência no treino. Ao chamar <code>model.predict(X_test)</code>, o pipeline só transforma o teste e faz a previsão; o SMOTENC não sintetiza linhas no teste.</p></section>
+<section id="avaliacao"><h2>3. Métricas da classe positiva</h2><p><code>evaluate()</code> obtém as classes do RF e seleciona explicitamente a coluna de probabilidade de <code>stroke=1</code>. As previsões binárias alimentam precisão, recall, F1, acurácia e matriz de confusão; a pontuação contínua alimenta a AUC-ROC.</p><pre><code>probabilities = model.predict_proba(X_test)[:, positive_index]
+predictions = model.predict(X_test)
+tn, fp, fn, tp = confusion_matrix(
+    y_test, predictions, labels=[0, 1]).ravel()</code></pre><p>O resultado <strong>TP=9 e FN=40</strong> mostra o limite principal: o RF não identificou a maioria dos positivos originais. Veja a <a href="metodologia.html#resultados">leitura completa das métricas</a>.</p></section>
+<section id="explicacao"><h2>4. TreeExplainer e verificação</h2><p><code>transform_for_rf()</code> reaplica a imputação e a codificação já ajustadas, sem refazer o treino ou o balanceamento. O <code>TreeExplainer</code> recebe o RF e produz contribuições para cada coluna codificada e cada classe. A função <code>positive_shap_values()</code> lida com os formatos de saída de versões diferentes do SHAP e escolhe <code>stroke=1</code>.</p><pre><code>explainer = shap.TreeExplainer(rf,
+    feature_perturbation="tree_path_dependent")
+values, base = positive_shap_values(
+    explainer, encoded_explain, rf.classes_)
+max_error = np.max(np.abs(
+    base + values.sum(axis=1) - probabilities))</code></pre><p>O notebook confirma <code>max_error ≈ 5,9 × 10⁻¹⁵</code>. Essa igualdade comprova que a soma das atribuições acompanha a saída do RF. Ela não mede se a classificação está correta.</p></section>
+<section id="global"><h2>5. Gráficos globais e casos locais</h2><p>O beeswarm usa as 22 colunas que entram no RF. Cada ponto é uma pessoa: posição horizontal é contribuição para a saída <code>stroke=1</code>; cor representa o valor da entrada. Para o gráfico de dez variáveis originais, <code>grouped_shap_importance()</code> soma as colunas one-hot da mesma variável <em>por pessoa</em> e só então calcula a média da magnitude absoluta.</p><pre><code>grouped[variable] = values[:, start:end].sum(axis=1)
+importance[variable] = np.abs(grouped[variable]).mean()</code></pre><p>Os waterfall plots partem do valor-base e mostram quais entradas elevaram ou reduziram a saída em um caso. Há um verdadeiro positivo e um falso negativo. O site exporta mais dez casos originais do teste; <code>site_export.py</code> confere a soma em cada um antes de gravar <code>data.js</code>.</p></section>
+<section id="arquivos"><h2>Arquivos originais para auditoria</h2><p>As páginas acima são uma leitura guiada; o código completo, comentários e saídas executadas permanecem nos arquivos abaixo.</p><ul class="docs-links"><li><a href="../notebooks/01_auditoria_dados.ipynb" download>Notebook 01: auditoria dos dados (.ipynb)</a></li><li><a href="../notebooks/02_modelo_e_shap.ipynb" download>Notebook 02: RF e SHAP (.ipynb)</a></li><li><a href="../stroke_xai.py">Funções de dados, pipeline, métricas e SHAP (.py)</a></li><li><a href="../visualizacoes.py">Geração dos gráficos (.py)</a></li><li><a href="../site_export.py">Exportação dos casos ao site (.py)</a></li><li><a href="../results/metrics.json">Métricas completas (.json)</a></li><li><a href="../README.md">Documentação técnica do repositório (.md)</a></li></ul></section>
+</article></main><footer><span>AVC / XAI · estudo acadêmico</span><a href="index.html">Voltar ao painel</a></footer></body></html>

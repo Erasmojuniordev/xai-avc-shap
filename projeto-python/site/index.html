@@ -49,7 +49,7 @@
         <article class="metric-card"><span>RECALL</span><strong>0,184</strong><small>9 de 49 positivos encontrados</small></article>
         <article class="metric-card"><span>F1</span><strong>0,145</strong><small>síntese de precisão e recall</small></article>
       </div>
-      <p class="method-note"><strong>Protocolo:</strong> divisão estratificada 80/20 → imputação e SMOTENC apenas no treino → codificação → RF com 200 árvores. <a href="../README.md">Leia a análise completa</a>.</p>
+      <p class="method-note"><strong>Protocolo:</strong> divisão estratificada 80/20 → imputação e SMOTENC apenas no treino → codificação → RF com 200 árvores. <a href="metodologia.html">Leia a análise completa</a>.</p>
     </section>
 
     <section class="section global" id="global">
@@ -94,9 +94,9 @@
       </div>
       <div class="limits-grid">
         <p>O alvo registra histórico de AVC no CSV, sem acompanhamento temporal demonstrado. As saídas do RF treinado com SMOTENC não foram calibradas; <strong>98% na interface não significa 98% de risco futuro</strong>.</p>
-        <p>Hipertensão e doença cardíaca tiveram contribuições menores neste RF, embora sejam fatores reconhecidos pelo <a href="https://www.cdc.gov/stroke/risk-factors/">CDC</a>. O ranking depende dos dados, das variáveis e do modelo. A <a href="../README.md">documentação</a> discute as inconsistências com o artigo e a procedência do CSV.</p>
+        <p>Hipertensão e doença cardíaca tiveram contribuições menores neste RF, embora sejam fatores reconhecidos pelo <a href="https://www.cdc.gov/stroke/risk-factors/">CDC</a>. O ranking depende dos dados, das variáveis e do modelo. A <a href="metodologia.html#limites">documentação</a> discute as inconsistências com o artigo e a procedência do CSV.</p>
       </div>
-      <div class="resource-links"><a href="../notebooks/02_modelo_e_shap.ipynb">Abrir notebook <span aria-hidden="true">↗</span></a><a href="../results/metrics.json">Métricas completas <span aria-hidden="true">↗</span></a><a href="../README.md">Metodologia e fontes <span aria-hidden="true">↗</span></a></div>
+      <div class="resource-links"><a href="codigo.html">Código explicado <span aria-hidden="true">↗</span></a><a href="metodologia.html#resultados">Resultados comentados <span aria-hidden="true">↗</span></a><a href="metodologia.html">Metodologia e fontes <span aria-hidden="true">↗</span></a></div>
     </section>
   </main>
   <footer><span>AVC / XAI · estudo acadêmico</span><span>Dados e explicações fixos do teste · sem entrada de novos pacientes</span></footer>
