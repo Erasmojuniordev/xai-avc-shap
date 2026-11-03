@@ -4,7 +4,7 @@ Este repositório reúne duas etapas independentes do trabalho da disciplina:
 
 | Pasta | Conteúdo |
 | --- | --- |
-| [`projeto-python/`](projeto-python/) | Projeto concluído: Random Forest em Python, avaliação em teste separado e explicações SHAP globais e locais. Inclui o CSV, o artigo base e a apresentação crítica. |
+| [`projeto-python/`](projeto-python/) | Projeto concluído: Random Forest em Python, avaliação em teste separado, explicações SHAP e painel interativo com dez casos. Inclui o CSV, o artigo base e a apresentação crítica. |
 | [`experimento-weka/`](experimento-weka/) | Experimento de reprodução aproximada no WEKA 3.8.6, com o MLP configurado conforme os parâmetros publicados. |
 | [`experimento-nhanes/`](experimento-nhanes/) | Avaliação adicional do RF e SHAP em dados públicos do CDC, com origem e perguntas documentadas. |
 

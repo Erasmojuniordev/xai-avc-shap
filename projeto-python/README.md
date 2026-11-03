@@ -17,6 +17,7 @@ Projeto da disciplina de Fundamentos da Inteligência Artificial. Reimplementamo
 | [`stroke_xai.py`](stroke_xai.py) | Funções reutilizadas pelo notebook: coorte, split, pipeline, métricas e tratamento do SHAP. |
 | [`experiments/compare_cv_protocols.py`](experiments/compare_cv_protocols.py) | Experimento secundário sobre a ordem do SMOTENC e da validação cruzada. |
 | [`results/`](results/) e [`figures/`](figures/) | Métricas e figuras exportadas dos experimentos. |
+| [`site/`](site/) | Painel estático com gráficos e dez explicações individuais interativas. |
 | [`apresentacao/Apresentacao_Critica_AVC_SHAP.pptx`](apresentacao/Apresentacao_Critica_AVC_SHAP.pptx) | Apresentação final da disciplina, com notas de fala incorporadas. |
 | [`requirements.txt`](requirements.txt) e [`requirements-lock.txt`](requirements-lock.txt) | Dependências diretas e versões transitivas da execução original. |
 
@@ -66,6 +67,10 @@ Também produzimos duas explicações individuais por *waterfall*:
 
 Nos dois casos, o notebook valida a aditividade das contribuições. Assim, **a aplicação de SHAP foi verificada matematicamente e é coerente com as previsões do RF neste CSV**. SHAP não valida a qualidade dos dados nem identifica causas médicas. As saídas do RF treinado com SMOTENC não foram calibradas para a prevalência observada; `0,98` não significa “98% de risco futuro de AVC”.
 
+### Painel interativo de dez casos
+
+O [site de exemplo](site/index.html) apresenta dez registros **originais do teste**: três verdadeiros positivos, três falsos negativos, dois falsos positivos e dois verdadeiros negativos. Ao escolher um caso e uma variável, o painel exibe seu valor, a contribuição SHAP agrupada e o sentido do efeito na saída do RF. A seleção de casos é determinística e não ajusta o modelo. [`site_export.py`](site_export.py) verifica que a soma das dez contribuições e do valor-base recompõe `predict_proba` em cada caso; o maior erro da execução foi inferior a `1e-6`. O site usa resultados fixos gerados pelo notebook, sem aceitar dados de novos pacientes ou inferir risco clínico. Basta abrir `site/index.html` no navegador; a interação funciona sem servidor.
+
 O [CDC](https://www.cdc.gov/stroke/risk-factors/) reconhece idade, pressão alta, doença cardíaca, diabetes e tabagismo como fatores associados ao AVC. No CSV adulto, `stroke=1` é mais frequente com hipertensão (13,3% contra 4,9%) e doença cardíaca (17,1% contra 5,1%). A importância SHAP menor desses indicadores **não nega a associação clínica**: idade e outras entradas podem compartilhar informação com eles; os dados, o modelo e a codificação também influenciam a atribuição. Não determinamos uma causa única para a posição no ranking. Tipo de trabalho e estado civil não devem ser interpretados como causas a partir desse gráfico.
 
 ## Limite fundamental: procedência do dataset
@@ -85,7 +90,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe experiments/compare_cv_protocols.py
 ```
 
-Também é possível abrir os notebooks pelo Jupyter. Execute a auditoria antes do modelo. A execução do segundo notebook atualiza os arquivos em `results/` e `figures/`; o script do experimento secundário atualiza `results/comparacao_cv.json`. O `requirements-lock.txt` registra o ambiente completo instalado na execução original.
+Também é possível abrir os notebooks pelo Jupyter. Execute a auditoria antes do modelo. A execução do segundo notebook atualiza os arquivos em `results/`, `figures/` e `site/data.js`; o script do experimento secundário atualiza `results/comparacao_cv.json`. O `requirements-lock.txt` registra o ambiente completo instalado na execução original.
 
 ## Referências
 

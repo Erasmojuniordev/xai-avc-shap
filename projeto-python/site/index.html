@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Painel acadêmico interativo de Random Forest e explicações SHAP para AVC.">
+  <title>AVC / XAI — Entenda as previsões</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="AVC XAI — início"><span class="brand-mark">✳</span> AVC <span class="brand-divider">/</span> XAI</a>
+    <nav aria-label="Navegação principal">
+      <a href="#resultado">Resultado</a>
+      <a href="#global">Visão global</a>
+      <a href="#explorar">Explorar casos</a>
+      <a href="#limites">Limites</a>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow light">PROJETO ACADÊMICO <span>·</span> RANDOM FOREST + SHAP</p>
+        <h1>O que influenciou a previsão <em>neste modelo?</em></h1>
+        <p class="hero-lead">Uma leitura visual das previsões feitas com o CSV do projeto. Escolha um registro real do teste e veja como cada dado alterou a saída do Random Forest para <code>stroke=1</code>.</p>
+        <a class="hero-cta" href="#explorar">Explorar 10 casos <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="hero-side" aria-label="Resumo da amostra">
+        <div class="hero-stat"><span>COORTE ADULTA</span><strong>4.194</strong><small>registros no CSV disponível</small></div>
+        <div class="hero-rule"></div>
+        <div class="hero-stat"><span>TESTE INTOCADO</span><strong>839</strong><small>49 com <code>stroke=1</code></small></div>
+        <div class="hero-rule"></div>
+        <p>As explicações mostram o comportamento do modelo, não uma estimativa clínica de risco futuro.</p>
+      </div>
+    </section>
+
+    <section class="section results" id="resultado">
+      <div class="section-intro">
+        <p class="eyebrow">01 / DESEMPENHO</p>
+        <h2>O teste revela a dificuldade de encontrar AVC.</h2>
+        <p>O conjunto de teste manteve a distribuição original. Precisão, recall e F1 abaixo se referem à classe positiva; uma acurácia isolada esconderia muitos casos não identificados.</p>
+      </div>
+      <div class="metric-grid">
+        <article class="metric-card"><span>AUC-ROC</span><strong>0,755</strong><small>ordenação entre as classes</small></article>
+        <article class="metric-card"><span>PRECISÃO</span><strong>0,120</strong><small>9 acertos em 75 alertas</small></article>
+        <article class="metric-card"><span>RECALL</span><strong>0,184</strong><small>9 de 49 positivos encontrados</small></article>
+        <article class="metric-card"><span>F1</span><strong>0,145</strong><small>síntese de precisão e recall</small></article>
+      </div>
+      <p class="method-note"><strong>Protocolo:</strong> divisão estratificada 80/20 → imputação e SMOTENC apenas no treino → codificação → RF com 200 árvores. <a href="../README.md">Leia a análise completa</a>.</p>
+    </section>
+
+    <section class="section global" id="global">
+      <div class="section-intro">
+        <p class="eyebrow">02 / EXPLICAÇÃO GLOBAL</p>
+        <h2>Quais entradas mais mudaram as previsões?</h2>
+        <p>A importância agrega as categorias da mesma variável por pessoa. A visualização de dispersão mostra quanto e em que direção cada entrada codificada contribuiu em 200 pessoas originais do teste.</p>
+      </div>
+      <div class="chart-grid">
+        <figure class="chart-card">
+          <img src="../figures/shap_importancia_agrupada.png" alt="Gráfico de importância SHAP por variável: idade, glicose média e tipo de trabalho estão nas primeiras posições." loading="lazy">
+          <figcaption>Magnitude média por variável original. Importância no modelo não mede causalidade.</figcaption>
+        </figure>
+        <figure class="chart-card">
+          <img src="../figures/shap_summary_stroke1.png" alt="Dispersão das contribuições SHAP; pontos à direita aumentam a saída para AVC e à esquerda reduzem." loading="lazy">
+          <figcaption>Cor indica valor alto ou baixo da entrada codificada; posição indica efeito na saída.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section explorer" id="explorar">
+      <div class="section-intro">
+        <p class="eyebrow">03 / EXPLICAÇÃO INDIVIDUAL</p>
+        <h2>Escolha um caso. Depois, um dado clínico.</h2>
+        <p>São dez registros originais do teste, com acertos e erros. Cada contribuição SHAP foi calculada para o mesmo RF e somada por variável original. Selecione uma entrada para ver seu efeito nesta previsão específica.</p>
+      </div>
+      <div class="explorer-layout">
+        <aside class="case-panel" aria-labelledby="case-list-title">
+          <div class="panel-top"><h3 id="case-list-title">Registros do teste</h3><span>10 CASOS</span></div>
+          <div id="case-list" class="case-list" role="group" aria-label="Selecione um registro"></div>
+        </aside>
+        <div class="detail-panel" id="case-detail" aria-live="polite">
+          <p>Carregando explicações...</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section limits" id="limites">
+      <div class="section-intro">
+        <p class="eyebrow light">04 / LEITURA RESPONSÁVEL</p>
+        <h2>SHAP explica a saída. Não valida o uso clínico.</h2>
+      </div>
+      <div class="limits-grid">
+        <p>O alvo registra histórico de AVC no CSV, sem acompanhamento temporal demonstrado. As saídas do RF treinado com SMOTENC não foram calibradas; <strong>98% na interface não significa 98% de risco futuro</strong>.</p>
+        <p>Hipertensão e doença cardíaca tiveram contribuições menores neste RF, embora sejam fatores reconhecidos pelo <a href="https://www.cdc.gov/stroke/risk-factors/">CDC</a>. O ranking depende dos dados, das variáveis e do modelo. A <a href="../README.md">documentação</a> discute as inconsistências com o artigo e a procedência do CSV.</p>
+      </div>
+      <div class="resource-links"><a href="../notebooks/02_modelo_e_shap.ipynb">Abrir notebook <span aria-hidden="true">↗</span></a><a href="../results/metrics.json">Métricas completas <span aria-hidden="true">↗</span></a><a href="../README.md">Metodologia e fontes <span aria-hidden="true">↗</span></a></div>
+    </section>
+  </main>
+  <footer><span>AVC / XAI · estudo acadêmico</span><span>Dados e explicações fixos do teste · sem entrada de novos pacientes</span></footer>
+</body>
+</html>
