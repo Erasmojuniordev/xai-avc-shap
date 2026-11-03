@@ -18,7 +18,7 @@ Projeto da disciplina de Fundamentos da Inteligência Artificial. Reimplementamo
 | [`experiments/compare_cv_protocols.py`](experiments/compare_cv_protocols.py) | Experimento secundário sobre a ordem do SMOTENC e da validação cruzada. |
 | [`results/`](results/) e [`figures/`](figures/) | Métricas e figuras exportadas dos experimentos. |
 | [`site/`](site/) | Painel estático com gráficos, dez explicações individuais e páginas legíveis de metodologia e código. |
-| [`apresentacao/Apresentacao_Critica_AVC_SHAP.pptx`](apresentacao/Apresentacao_Critica_AVC_SHAP.pptx) | Apresentação final em 14 lâminas, com os novos gráficos e notas de fala. |
+| [`apresentacao/Apresentacao_Critica_AVC_SHAP.pptx`](apresentacao/Apresentacao_Critica_AVC_SHAP.pptx) | Apresentação final em 18 lâminas, com comparações visuais, gráficos SHAP, referências em formato ABNT e notas de fala. |
 | [`requirements.txt`](requirements.txt) e [`requirements-lock.txt`](requirements-lock.txt) | Dependências diretas e versões transitivas da execução original. |
 
 O [repositório de Alberto Eusebio](https://github.com/AlbertoEusebio/Brain-Stroke-Prediction) foi apenas referência auxiliar para a ideia de usar SMOTENC em dados mistos. Ele **não é o código dos autores do artigo**. O código deste repositório foi escrito para a extensão proposta.
