@@ -6,4 +6,5 @@ __pycache__/
 .pytest_cache/
 experimento-weka/.build/
 experimento-weka/dados/*.arff
+experimento-nhanes/dados/*.xpt
 

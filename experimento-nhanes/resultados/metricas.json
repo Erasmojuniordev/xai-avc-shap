@@ -1,0 +1,79 @@
+{
+  "fonte": "NHANES CDC, ciclos 2015-2016 e 2017-2018",
+  "alvo": "MCQ160F: relato de diagnóstico prévio de AVC, não risco futuro",
+  "idade_minima": 60,
+  "seed": 42,
+  "n_total": 4041,
+  "positivos_total": 354,
+  "n_treino": 3232,
+  "positivos_treino": 283,
+  "n_teste": 809,
+  "positivos_teste": 71,
+  "ausencias_entradas": {
+    "idade": 0,
+    "imc": 315,
+    "sexo": 0,
+    "hipertensao": 9,
+    "doenca_coronariana": 33,
+    "diabetes": 2,
+    "fumou_100_cigarros": 7
+  },
+  "sha256_xpt": {
+    "BMX_I.xpt": "d31da84e14212b4e58e8340598a5b8e2144fac83333563e966eb1b332e4141d6",
+    "BMX_J.xpt": "8d675e42d8826ac98714b2c3dd4c5138a5e353fb4424f7eff5e6db4a01ce838a",
+    "BPQ_I.xpt": "7f7e51cd0497eb648f64eaafaf7ed07825d617c32b2cd6853ed249fce1143a38",
+    "BPQ_J.xpt": "63cfe1c331a1e7d3534328ac86312a21ffee3e01aa189bc1f74d06855239e5aa",
+    "DEMO_I.xpt": "c9297c6c37ae8f78f29be9568fa2a03cf3b112616a39afee04030fc775a66a0d",
+    "DEMO_J.xpt": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec",
+    "DIQ_I.xpt": "e87587479b29f175b63eee5dd40d582837e3e3fe2665503012085eefdb978e0d",
+    "DIQ_J.xpt": "1ecbf5360dfc331d1efbf32198553dc30e9a1f4cff0a907ed30ca72bac797f89",
+    "MCQ_I.xpt": "8b2bd62f5bcd5820d6aac380e4bad233d22ecab42fcf4a3a9a023ffc6b9f4002",
+    "MCQ_J.xpt": "79c50c805a377fcd61d44fae8b86a16af0a5741f8b1aeebda918d7d743c68f98",
+    "SMQ_I.xpt": "529ce1c407e99dce937ca75d14c8c630e0c9c30a4a9a851760cd2884bbb28fe0",
+    "SMQ_J.xpt": "73c3708e540cbf520a566508aa629c3e4ba53cad77dae9388ca36384646455f4"
+  },
+  "resultados": {
+    "rf_sem_smotenc": {
+      "accuracy": 0.8912237330037083,
+      "precision_stroke_1": 0.16,
+      "recall_stroke_1": 0.056338028169014086,
+      "f1_stroke_1": 0.08333333333333333,
+      "auc_stroke_1": 0.5589621741287836,
+      "tn": 717,
+      "fp": 21,
+      "fn": 67,
+      "tp": 4
+    },
+    "rf_smotenc_treino": {
+      "accuracy": 0.8071693448702101,
+      "precision_stroke_1": 0.13675213675213677,
+      "recall_stroke_1": 0.22535211267605634,
+      "f1_stroke_1": 0.1702127659574468,
+      "auc_stroke_1": 0.5997080041222946,
+      "tn": 637,
+      "fp": 101,
+      "fn": 55,
+      "tp": 16
+    }
+  },
+  "shap": {
+    "amostra_global": 150,
+    "erro_maximo_aditividade": 1.2156942119645464e-14,
+    "importancia_agrupada": {
+      "idade": 0.15368491033375326,
+      "imc": 0.10631550102497796,
+      "hipertensao": 0.07940481865860274,
+      "fumou_100_cigarros": 0.05183248599793018,
+      "doenca_coronariana": 0.04993219445546069,
+      "diabetes": 0.04634098740892211,
+      "sexo": 0.03452160976177905
+    },
+    "caso_local": {
+      "seqn": 98901,
+      "rotulo": 1,
+      "previsao": 1,
+      "probabilidade_modelo": 1.0,
+      "erro_aditividade": 1.887379141862766e-15
+    }
+  }
+}
